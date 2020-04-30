@@ -8,7 +8,6 @@ SETTINGS = {
     'python.linting.pylintEnabled': False,
     'python.linting.flake8Enabled': True,
     'python.linting.enabled': True,
-    'python.venvPath': '.venv',
     'autoDocstring.docstringFormat': 'google',
     'editor.renderWhitespace': 'boundary',
 }
