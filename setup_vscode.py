@@ -5,10 +5,6 @@ from pathlib import Path
 
 
 SETTINGS = {
-    'python.linting.pylintEnabled': False,
-    'python.linting.flake8Enabled': True,
-    'python.linting.enabled': True,
-    'autoDocstring.docstringFormat': 'google',
     'editor.renderWhitespace': 'boundary',
 }
 
