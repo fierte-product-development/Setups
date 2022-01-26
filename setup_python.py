@@ -84,7 +84,7 @@ def is_in_pipfile_lock(lib_name: str) -> bool:
 
 
 def create_venv(setuptools_ver: str = None, wheel_ver: str = None) -> None:
-    """`pipenv`を用いて実行ディレクトリ直下に`.venv`フォルダを作ります。
+    """`pipenv`を用いて実行ディレクトリ直下に`.venv`フォルダを作りPython実行環境を作ります。
 
     Args:
         setuptools_ver (str, optional): 環境作成に用いる`setuptools`のバージョンを指定します。
@@ -113,7 +113,13 @@ def main():
     pip_install('pipenv')
     remove_venv()
     exists_in_cd('Pipfile.lock')
-    create_venv()
+    if is_in_pipfile_lock('comtypes'):
+        # `comtypes`を3系にインストールするために必要なバージョン。詳細は下記参照
+        # https://github.com/enthought/comtypes/issues/180#issuecomment-1009586423
+        setuptools_ver, wheel_ver = '57.0.0', '0.36.2'
+    else:
+        setuptools_ver, wheel_ver = None, None
+    create_venv(setuptools_ver, wheel_ver)
     _conf_exit(0, True)
 
 
