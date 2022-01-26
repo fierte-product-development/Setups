@@ -3,7 +3,6 @@ import os
 import subprocess
 from subprocess import PIPE, STDOUT
 from pathlib import Path
-from typing import Any
 
 
 proc_arg = {
@@ -67,10 +66,10 @@ def exists_in_cd(tgt):
 
 
 def _change_ver(name: str, ver: str) -> None:
-    """`pipenv update/install ...`を使用せず、仮想環境の`pip`を直接使ってライブラリのバージョンを変更します。
+    """仮想環境のpipを直接使ってライブラリのバージョンを変更します。
 
     Note:
-        `Pipfile.lock`で管理できない、環境作成時に用いるセットアップ系ライブラリを指定するための関数。
+        `Pipfile.lock`で管理できない、環境作成時に用いるライブラリのバージョンを指定するための関数。
     """
     print(f'`{name}`のバージョンを{ver}に変更します。')
     _popen('pipenv', 'run', 'python', '-m', 'pip', 'uninstall', '-y', name)
