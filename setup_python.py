@@ -93,8 +93,7 @@ def create_venv(setuptools_ver: str = None, wheel_ver: str = None) -> None:
     """
     print('仮想環境を作成します。')
     os.environ['PIPENV_VENV_IN_PROJECT'] = 'true'
-    # 事前に`.venv`フォルダが必要なため、`pipenv run 任意のコマンド`(今回は`pip list`)を実行
-    _popen('pipenv', 'run', 'python', '-m', 'pip', 'list')
+    _popen('pipenv', 'run', 'python', '-m', 'pip', 'list')  # 事前に`.venv`フォルダが必要なため、`pipenv run 任意のコマンド`(今回は`pip list`)を実行
     if setuptools_ver:
         _change_ver('setuptools', setuptools_ver)
     if wheel_ver:
