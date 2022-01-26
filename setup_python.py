@@ -84,7 +84,7 @@ def is_in_pipfile_lock(lib_name: str) -> bool:
 
 
 def create_venv(setuptools_ver: str = None, wheel_ver: str = None) -> None:
-    """`pipenv`を用いて実行ディレクトリ直下に`.venv`フォルダを作りPython実行環境を作ります。
+    """`pipenv`を用いて実行ディレクトリ直下に`.venv`フォルダを作りPython仮想環境を作ります。
 
     Args:
         setuptools_ver (str, optional): 環境作成に用いる`setuptools`のバージョンを指定します。
@@ -92,10 +92,9 @@ def create_venv(setuptools_ver: str = None, wheel_ver: str = None) -> None:
         wheel_ver (str, optional): 環境作成に用いる`wheel`のバージョンを指定します。
             デフォルトではローカル環境にある`pipenv`の仕様に依存したバージョンとなります。
     """
-    _popen('chcp', '65001')
-    print('`.venv`フォルダを作成します。')
+    print('仮想環境を作成します。')
     os.environ['PIPENV_VENV_IN_PROJECT'] = 'true'
-    print('.venv にpython.exeや環境セットアップ系ライブラリをインストールします。')
+    print('`.venv`フォルダを作成して`python.exe`や環境セットアップ系ライブラリをインストールします。')
     # `pipenv sync ...`前に`pipenv run ...`することで、ライブラリ依存関係構築の前に
     # `.venv`フォルダを作成してデフォルトの`pip`, `setuptools`, `wheel`をインストールする
     _popen('pipenv', 'run', 'python', '-m', 'pip', 'list')
@@ -105,10 +104,11 @@ def create_venv(setuptools_ver: str = None, wheel_ver: str = None) -> None:
         _change_ver('wheel', wheel_ver)
     print('`.venv`フォルダに`Pipfile.lock`で指定されているライブラリをインストールします。')
     _popen('pipenv', 'sync', '--dev')
-    print('`.venv`フォルダの作成が完了しました。')
+    print('仮想環境の作成が完了しました。')
 
 
 def main():
+    _popen('chcp', '65001')  # 文字コードにより`pipenv`が失敗する可能性があるため指定
     print('Python環境のセットアップを行います…\n')
     pip_install('pipenv')
     remove_venv()
