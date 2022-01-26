@@ -3,6 +3,7 @@ import os
 import subprocess
 from subprocess import PIPE, STDOUT
 from pathlib import Path
+from typing import Any
 
 
 proc_arg = {
@@ -65,10 +66,46 @@ def exists_in_cd(tgt):
         _conf_exit(1)
 
 
-def create_venv():
-    print('.venv フォルダを作成します。')
+def _change_ver(name: str, ver: str) -> None:
+    """`pipenv update/install ...`を使用せず、仮想環境の`pip`を直接使ってライブラリのバージョンを変更します。
+
+    Note:
+        `Pipfile.lock`で管理できない、環境作成時に用いるセットアップ系ライブラリを指定するための関数。
+    """
+    print(f'`{name}`のバージョンを{ver}に変更します。')
+    _popen('pipenv', 'run', 'python', '-m', 'pip', 'uninstall', '-y', name)
+    _popen('pipenv', 'run', 'python', '-m', 'pip', 'install', f'{name}=={ver}')
+
+
+def is_in_pipfile_lock(lib_name: str) -> bool:
+    """ライブラリが`Pipfile.lock`に指定されているかを返す"""
+    lock_data = (Path(_run('cd')) / 'Pipfile.lock').read_text(encoding='utf_8')
+    return f'"{lib_name}"' in lock_data
+
+
+def create_venv(setuptools_ver: str = None, wheel_ver: str = None) -> None:
+    """`pipenv`を用いて実行ディレクトリ直下に`.venv`フォルダを作ります。
+
+    Args:
+        setuptools_ver (str, optional): 環境作成に用いる`setuptools`のバージョンを指定します。
+            デフォルトではローカル環境にある`pipenv`の仕様に依存したバージョンとなります。
+        wheel_ver (str, optional): 環境作成に用いる`wheel`のバージョンを指定します。
+            デフォルトではローカル環境にある`pipenv`の仕様に依存したバージョンとなります。
+    """
+    _popen('chcp', '65001')
+    print('`.venv`フォルダを作成します。')
     os.environ['PIPENV_VENV_IN_PROJECT'] = 'true'
+    print('.venv にpython.exeや環境セットアップ系ライブラリをインストールします。')
+    # `pipenv sync ...`前に`pipenv run ...`することで、ライブラリ依存関係構築の前に
+    # `.venv`フォルダを作成してデフォルトの`pip`, `setuptools`, `wheel`をインストールする
+    _popen('pipenv', 'run', 'python', '-m', 'pip', 'list')
+    if setuptools_ver:
+        _change_ver('setuptools', setuptools_ver)
+    if wheel_ver:
+        _change_ver('wheel', wheel_ver)
+    print('`.venv`フォルダに`Pipfile.lock`で指定されているライブラリをインストールします。')
     _popen('pipenv', 'sync', '--dev')
+    print('`.venv`フォルダの作成が完了しました。')
 
 
 def main():
