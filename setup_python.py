@@ -93,9 +93,7 @@ def create_venv(setuptools_ver: str = None, wheel_ver: str = None) -> None:
     """
     print('仮想環境を作成します。')
     os.environ['PIPENV_VENV_IN_PROJECT'] = 'true'
-    print('`.venv`フォルダを作成して`python.exe`や環境セットアップ系ライブラリをインストールします。')
-    # `pipenv sync ...`前に`pipenv run ...`することで、ライブラリ依存関係構築の前に
-    # `.venv`フォルダを作成してデフォルトの`pip`, `setuptools`, `wheel`をインストールする
+    # 事前に`.venv`フォルダが必要なため、`pipenv run 任意のコマンド`(今回は`pip list`)を実行
     _popen('pipenv', 'run', 'python', '-m', 'pip', 'list')
     if setuptools_ver:
         _change_ver('setuptools', setuptools_ver)
