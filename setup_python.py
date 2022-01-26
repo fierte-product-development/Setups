@@ -108,7 +108,7 @@ def create_venv(setuptools_ver: str = None, wheel_ver: str = None) -> None:
 
 
 def main():
-    _popen('chcp', '65001')  # 文字コードにより`pipenv`が失敗する可能性があるため指定
+    _popen('chcp', '65001')  # デフォルト文字コードでは`pipenv`が失敗する可能性があるため指定
     print('Python環境のセットアップを行います…\n')
     pip_install('pipenv')
     remove_venv()
