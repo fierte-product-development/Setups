@@ -65,18 +65,57 @@ def exists_in_cd(tgt):
         _conf_exit(1)
 
 
-def create_venv():
-    print('.venv フォルダを作成します。')
+def _change_ver(name: str, ver: str) -> None:
+    """仮想環境のpipを直接使ってライブラリのバージョンを変更します。
+
+    Note:
+        `Pipfile.lock`で管理できない、環境作成時に用いるライブラリのバージョンを指定するための関数。
+    """
+    print(f'`{name}`のバージョンを{ver}に変更します。')
+    _popen('pipenv', 'run', 'python', '-m', 'pip', 'uninstall', '-y', name)
+    _popen('pipenv', 'run', 'python', '-m', 'pip', 'install', f'{name}=={ver}')
+
+
+def is_in_pipfile_lock(lib_name: str) -> bool:
+    """ライブラリが`Pipfile.lock`に指定されているかを返す"""
+    lock_data = (Path(_run('cd')) / 'Pipfile.lock').read_text(encoding='utf_8')
+    return f'"{lib_name}"' in lock_data
+
+
+def create_venv(setuptools_ver: str = None, wheel_ver: str = None) -> None:
+    """`pipenv`を用いて実行ディレクトリ直下に`.venv`フォルダを作りPython仮想環境を作ります。
+
+    Args:
+        setuptools_ver (str, optional): 環境作成に用いる`setuptools`のバージョンを指定します。
+            デフォルトではローカル環境にある`pipenv`の仕様に依存したバージョンとなります。
+        wheel_ver (str, optional): 環境作成に用いる`wheel`のバージョンを指定します。
+            デフォルトではローカル環境にある`pipenv`の仕様に依存したバージョンとなります。
+    """
+    print('仮想環境を作成します。')
     os.environ['PIPENV_VENV_IN_PROJECT'] = 'true'
+    _popen('pipenv', 'run', 'python', '-m', 'pip', 'list')  # 事前に`.venv`フォルダが必要なため、`pipenv run 任意のコマンド`を実行
+    if setuptools_ver:
+        _change_ver('setuptools', setuptools_ver)
+    if wheel_ver:
+        _change_ver('wheel', wheel_ver)
+    print('`.venv`フォルダに`Pipfile.lock`で指定されているライブラリをインストールします。')
     _popen('pipenv', 'sync', '--dev')
+    print('仮想環境の作成が完了しました。')
 
 
 def main():
+    _popen('chcp', '65001')  # デフォルト文字コードでは`pipenv`が失敗する可能性があるため指定
     print('Python環境のセットアップを行います…\n')
     pip_install('pipenv')
     remove_venv()
     exists_in_cd('Pipfile.lock')
-    create_venv()
+    if is_in_pipfile_lock('comtypes'):
+        # `comtypes`を3系にインストールするために必要なバージョン。詳細は下記参照
+        # https://github.com/enthought/comtypes/issues/180#issuecomment-1009586423
+        setuptools_ver, wheel_ver = '57.0.0', '0.36.2'
+    else:
+        setuptools_ver, wheel_ver = None, None
+    create_venv(setuptools_ver, wheel_ver)
     _conf_exit(0, True)
 
 
