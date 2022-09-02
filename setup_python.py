@@ -109,13 +109,7 @@ def main():
     pip_install('pipenv')
     remove_venv()
     exists_in_cd('Pipfile.lock')
-    if is_in_pipfile_lock('comtypes'):
-        # `comtypes`を3系にインストールするために必要なバージョン。詳細は下記参照
-        # https://github.com/enthought/comtypes/issues/180#issuecomment-1009586423
-        setuptools_ver, wheel_ver = '57.0.0', '0.36.2'
-    else:
-        setuptools_ver, wheel_ver = None, None
-    create_venv(setuptools_ver, wheel_ver)
+    create_venv()
     _conf_exit(0, True)
 
 
